@@ -1,5 +1,6 @@
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
 
 local BossConfig = require(game:GetService("ReplicatedStorage").ShinobiShared.BossConfig)
 local AssetConfig = require(game:GetService("ReplicatedStorage").ShinobiShared.AssetConfig)
@@ -564,6 +565,62 @@ function WorldService:BuildMapIntegration(imported, runtime)
 		interaction.Parent = point
 		interaction.Triggered:Connect(callback)
 	end
+	local function activateDoor(door, displayName, onOpen)
+		if not door or not door:IsA("BasePart") then return end
+		door:SetAttribute("ShinobiDoor", true)
+		local closed = door.CFrame
+		local opened = false
+		local busy = false
+		local doorPrompt = Instance.new("ProximityPrompt")
+		doorPrompt.ActionText = "Abrir"
+		doorPrompt.ObjectText = displayName
+		doorPrompt.HoldDuration = 0
+		doorPrompt.MaxActivationDistance = 10
+		doorPrompt.RequiresLineOfSight = false
+		doorPrompt.Parent = door
+		doorPrompt.Triggered:Connect(function(player)
+			if busy then return end
+			busy = true
+			opened = not opened
+			doorPrompt.ActionText = opened and "Fechar" or "Abrir"
+			door.CanCollide = not opened
+			TweenService:Create(door, TweenInfo.new(0.38, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				CFrame = opened and (closed * CFrame.Angles(0, math.rad(82), 0)) or closed,
+			}):Play()
+			if opened and onOpen then onOpen(player) end
+			task.delay(0.45, function() busy = false end)
+		end)
+	end
+	local function decorateWindow(window)
+		if not window or not window:IsA("BasePart") then return end
+		window.Material = Enum.Material.Glass
+		window.Color = Color3.fromRGB(156, 206, 238)
+		window.Transparency = math.max(window.Transparency, 0.22)
+		window.Reflectance = 0.08
+		window.CanCollide = false
+	end
+	local commerceBuildings = {
+		{ Name = "Posto do Kage", Open = function(player) self.Context.Remotes.WorldAction:FireClient(player, "Progression") end },
+		{ Name = "Taverna do Ramen", Open = function(player)
+			local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Health = humanoid.MaxHealth end
+			self.Context.Remotes.Notification:FireClient(player, { Kind = "Ramen", Text = "Você descansou na Taverna do Ramen e recuperou sua vida." })
+		end },
+		{ Name = "Banco de Yen", Open = function(player) self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Featured") end },
+		{ Name = "Casa de Campeões", Open = function(player) self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Inventory") end },
+		{ Name = "Armazém de Espadas", Open = function(player) self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Featured") end },
+		{ Name = "Loja de Jutsus", Open = function(player) self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Crates") end },
+	}
+	for _, entry in commerceBuildings do
+		local buildingName = entry.Name
+		local building = find(buildingName)
+		if building then
+			activateDoor(building:FindFirstChild("Porta", true), buildingName, entry.Open)
+			decorateWindow(building:FindFirstChild("JanelaDir", true))
+			decorateWindow(building:FindFirstChild("JanelaEsq", true))
+		end
+	end
+	activateDoor(find("PortaCasaPrincipal"), "Casa Principal")
 	local commerce = find("VilaDoComercio") or find("CidadeComercio")
 	local shop = anchor("ShopEntrance", commerce)
 	prompt(shop, "Abrir loja", "Mercado Shinobi", function(player)
