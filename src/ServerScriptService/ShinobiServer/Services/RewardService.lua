@@ -11,7 +11,6 @@ function RewardService:Init(context)
 	self.Profiles = context.Services.ProfileService
 	self.Progression = context.Services.ProgressionService
 	self.Quests = context.Services.QuestService
-	self.Clans = context.Services.ClanService
 	self.Remotes = context.Remotes
 	self.Random = Random.new()
 	self.NextEquip = {}
@@ -74,7 +73,6 @@ function RewardService:AwardBoss(player, bossId, rewardMultiplier)
 		data.EventTickets += bonusTickets
 	end)
 	self.Quests:Record(player, "BossKill", 1)
-	self.Clans:AddContribution(player, math.floor(100 * multiplier))
 	self.Remotes.Notification:FireClient(player, {
 		Kind = "BossReward",
 		Text = string.format("%s derrotado: +%d XP, +%d Ryo, +%d Gemas, +%d Tickets", definition.DisplayName, xp, ryo, bonusGems, bonusTickets),

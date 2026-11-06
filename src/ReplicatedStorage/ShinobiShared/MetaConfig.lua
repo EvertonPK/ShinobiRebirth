@@ -51,13 +51,6 @@ MetaConfig.Achievements = {
 		Goal = 100,
 		Reward = { Ryo = 100000, Gems = 500, EventTickets = 50 },
 	},
-	ClanVanguard = {
-		Name = "Vanguarda do Clã",
-		Description = "Contribua 5.000 pontos para seu clã.",
-		Metric = "ClanContribution",
-		Goal = 5000,
-		Reward = { Ryo = 25000, Gems = 125 },
-	},
 	Collector = {
 		Name = "Colecionador",
 		Description = "Colecione 10 cosméticos.",
@@ -77,7 +70,6 @@ MetaConfig.Achievements = {
 MetaConfig.Leaderboards = {
 	{ Id = "Level", Name = "Nível", Descending = true },
 	{ Id = "Rebirths", Name = "Rebirths", Descending = true },
-	{ Id = "ClanContribution", Name = "Contribuição", Descending = true },
 	{ Id = "BossKillsTotal", Name = "Chefes", Descending = true },
 }
 

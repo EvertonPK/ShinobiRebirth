@@ -51,5 +51,5 @@ return table.freeze({
 	GoldenWanderer = item("Traje do Andarilho Dourado", "Legendary", "Cosmetic", 0.003, 140, { "WeeklyPass", "LegendaryChest" }, 9000),
 	FrostfangBlade = item("Presa de Gelo", "Legendary", "WeaponSkin", 0.005, 110, { "FrostInvasion", "EventChest" }, 7200),
 	SpiritBloomEyes = item("Olhos da Flor Espiritual", "Legendary", "Eyes", 0.004, 130, { "BloomEvent", "EventChest" }, 8200),
-	DragonPulseAura = item("Aura do Pulso Dracônico", "Mythic", "Aura", 0.0005, 350, { "ClanWarChampion", "MythicChest" }, 30000),
+	DragonPulseAura = item("Aura do Pulso Dracônico", "Mythic", "Aura", 0.0005, 350, { "EndlessCycle", "MythicChest" }, 30000),
 })

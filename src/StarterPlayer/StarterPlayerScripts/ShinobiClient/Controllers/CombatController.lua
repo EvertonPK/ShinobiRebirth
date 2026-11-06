@@ -50,12 +50,8 @@ function CombatController:Start()
 	self:BindAction("ShinobiPhantomCuts", { Enum.KeyCode.R, Enum.KeyCode.ButtonY }, function()
 		self.Remotes.AbilityRequest:FireServer("PhantomCuts")
 	end, "R", UDim2.new(1, -320, 1, -270))
-	self:BindAction("ShinobiClanAwakening", { Enum.KeyCode.T, Enum.KeyCode.DPadUp }, function()
-		self.Remotes.AbilityRequest:FireServer("ClanAwakening")
-	end, "T", UDim2.new(1, -420, 1, -220))
-
 	if not UserInputService.TouchEnabled then
-		for _, action in { "ShinobiLight", "ShinobiHeavy", "ShinobiDash", "ShinobiChakraBurst", "ShinobiPhantomCuts", "ShinobiClanAwakening" } do
+		for _, action in { "ShinobiLight", "ShinobiHeavy", "ShinobiDash", "ShinobiChakraBurst", "ShinobiPhantomCuts" } do
 			local button = ContextActionService:GetButton(action)
 			if button then
 				button.Visible = false

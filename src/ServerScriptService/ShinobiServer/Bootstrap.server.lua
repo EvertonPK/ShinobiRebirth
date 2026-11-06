@@ -36,7 +36,6 @@ local order = {
 	"WorldService",
 	"ProgressionService",
 	"CosmeticService",
-	"ClanService",
 	"RewardService",
 	"QuestService",
 	"LiveOpsService",

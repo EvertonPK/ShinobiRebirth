@@ -158,6 +158,7 @@ function BossService:BroadcastState(extra)
 		active.LastStateSent = now
 	end
 	local state = extra or {}
+	state.Cycle = self.Cycle
 	if active then
 		state.Active = true
 		state.Id = active.Id

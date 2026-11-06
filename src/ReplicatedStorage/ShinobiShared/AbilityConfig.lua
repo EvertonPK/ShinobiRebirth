@@ -17,13 +17,4 @@ return table.freeze({
 		Multiplier = 3.8,
 		Color = Color3.fromRGB(220, 91, 255),
 	},
-	ClanAwakening = {
-		Name = "Despertar do Clã",
-		Key = "T",
-		Cost = 60,
-		Cooldown = 24,
-		Range = 45,
-		Multiplier = 6,
-		Color = Color3.fromRGB(255, 174, 63),
-	},
 })

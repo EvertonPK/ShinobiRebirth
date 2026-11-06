@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local JourneyConfig = require(ReplicatedStorage.ShinobiShared.JourneyConfig)
 
 local QuestService = {}
 
@@ -31,6 +32,7 @@ function QuestService:EnsureDaily(player)
 	if profile.Quests.DailyStamp == stamp then
 		return
 	end
+	local journeyReward, journeyName, journeyCycle
 	self.Profiles:Mutate(player, function(data)
 		data.Quests.DailyStamp = stamp
 		data.Quests.Daily = {}
@@ -63,7 +65,35 @@ function QuestService:Record(player, kind, amount)
 			end
 		end
 		data.Quests.Lifetime[kind] = (data.Quests.Lifetime[kind] or 0) + (amount or 1)
+		data.Journey = data.Journey or { Stage = 1, Cycle = 1, Progress = 0 }
+		local journey = data.Journey
+		local step = JourneyConfig.GetStep(journey.Stage)
+		if step.Counter == kind then
+			journey.Progress = math.min(step.Goal, (journey.Progress or 0) + (amount or 1))
+			if journey.Progress >= step.Goal then
+				local scale = JourneyConfig.RewardScale(journey.Cycle)
+				journeyReward = {}
+				for currency, value in step.Reward do journeyReward[currency] = math.floor(value * scale) end
+				journeyName, journeyCycle = step.Name, journey.Cycle
+				journey.Stage += 1
+				journey.Progress = 0
+				if journey.Stage > #JourneyConfig.Steps then
+					journey.Stage = 1
+					journey.Cycle += 1
+				end
+			end
+		end
 	end)
+	if journeyReward then
+		if journeyReward.XP then self.Progression:AddXP(player, journeyReward.XP) end
+		if journeyReward.Ryo then self.Progression:AddRyo(player, journeyReward.Ryo) end
+		self.Profiles:Mutate(player, function(data)
+			for _, currency in { "Gems", "EventTickets", "StyleTokens", "Essence" } do
+				data[currency] += journeyReward[currency] or 0
+			end
+		end)
+		self.Remotes.Notification:FireClient(player, { Kind = "Journey", Text = string.format("Objetivo concluído: %s • Ciclo %d", journeyName, journeyCycle) })
+	end
 end
 
 function QuestService:Start()
@@ -103,7 +133,6 @@ function QuestService:Start()
 			local current = data.Quests.Daily[questIndex]
 			if current and not current.Claimed and current.Progress >= current.Goal then
 				current.Claimed = true
-				data.Quests.Lifetime.DailyClaim = (data.Quests.Lifetime.DailyClaim or 0) + 1
 				claimed = true
 			end
 		end)
@@ -112,6 +141,7 @@ function QuestService:Start()
 		end
 		self.Progression:AddXP(player, xp)
 		self.Progression:AddRyo(player, ryo)
+		self:Record(player, "DailyClaim", 1)
 		self.Remotes.Notification:FireClient(player, {
 			Kind = "Quest",
 			Text = string.format("Missão concluída: +%d XP, +%d Ryo", xp, ryo),

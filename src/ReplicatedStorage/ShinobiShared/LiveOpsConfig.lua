@@ -10,7 +10,7 @@ LiveOpsConfig.DailyEvents = {
 	{ Id = "BossRush", Name = "Investida dos Chefes", Description = "Chefes rendem mais recompensas e mutadores melhores.", Modifiers = { XP = 1.15, Ryo = 1.2, BossReward = 1.6, LootLuck = 1.2 } },
 	{ Id = "BountyHunt", Name = "Caçada aos Renegados", Description = "Inimigos de campo concedem XP e Ryo adicionais.", Modifiers = { XP = 1.35, Ryo = 1.5, BossReward = 1, LootLuck = 1.05 } },
 	{ Id = "TreasureRain", Name = "Chuva de Tesouros", Description = "A sorte de drops aumenta para todos, sem custo de entrada.", Modifiers = { XP = 1, Ryo = 1.15, BossReward = 1.15, LootLuck = 1.75 } },
-	{ Id = "ClanRally", Name = "Chamado dos Clãs", Description = "Contribuições de clã e recompensas de chefe recebem bônus.", Modifiers = { XP = 1.2, Ryo = 1.2, BossReward = 1.35, LootLuck = 1.15, Clan = 2 } },
+	{ Id = "EndlessRift", Name = "Fenda Infinita", Description = "Cada ciclo de chefes fica mais difícil e concede recompensas maiores.", Modifiers = { XP = 1.25, Ryo = 1.25, BossReward = 1.45, LootLuck = 1.2, Mastery = 1.2 } },
 	{ Id = "MasterySurge", Name = "Surto de Maestria", Description = "Um dia para evoluir técnicas e avançar níveis mais rápido.", Modifiers = { XP = 1.75, Ryo = 1, BossReward = 1.1, LootLuck = 1, Mastery = 1.75 } },
 	{ Id = "LegendaryHunt", Name = "Caçada Lendária", Description = "A chance de itens raros aumenta, mantendo o pity.", Modifiers = { XP = 1.1, Ryo = 1.1, BossReward = 1.25, LootLuck = 2 } },
 }

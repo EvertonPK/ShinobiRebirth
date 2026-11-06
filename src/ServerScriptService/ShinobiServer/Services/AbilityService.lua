@@ -27,9 +27,6 @@ function AbilityService:Cast(player, abilityId)
 	if not profile then
 		return
 	end
-	if abilityId == "ClanAwakening" and profile.Clan == "" then
-		return
-	end
 	local state = self.Cooldowns[player] or {}
 	self.Cooldowns[player] = state
 	if os.clock() < (state[abilityId] or 0) then

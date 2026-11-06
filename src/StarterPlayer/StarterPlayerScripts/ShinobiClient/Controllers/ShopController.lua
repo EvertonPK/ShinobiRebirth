@@ -67,6 +67,71 @@ local function rarityColor(rarity)
 	return COLORS[rarity or ""] or COLORS.Muted
 end
 
+local function previewPart(parent, name, size, cframe, color, material, shape)
+	local object = Instance.new("Part")
+	object.Name = name
+	object.Size = size
+	object.CFrame = cframe
+	object.Color = color
+	object.Material = material or Enum.Material.SmoothPlastic
+	object.Shape = shape or Enum.PartType.Block
+	object.Anchored = true
+	object.CanCollide = false
+	object.Parent = parent
+	return object
+end
+
+local function itemPreview(parent, entry, position, size, crate)
+	local rarity = rarityColor(entry.Rarity or (crate and "Legendary") or "Common")
+	local viewport = create("ViewportFrame", {
+		Position = position,
+		Size = size,
+		BackgroundColor3 = Color3.fromRGB(14, 17, 26),
+		BackgroundTransparency = 0.08,
+		BorderSizePixel = 0,
+		Ambient = Color3.fromRGB(180, 185, 205),
+		LightColor = rarity,
+		LightDirection = Vector3.new(-1, -1, -1),
+		ZIndex = 14,
+	}, parent)
+	round(viewport, 10)
+	stroke(viewport, rarity, 0.35, 1)
+	local world = Instance.new("WorldModel")
+	world.Parent = viewport
+	local kind = tostring(entry.Type or "Cosmetic")
+	if crate then
+		previewPart(world, "Chest", Vector3.new(5.8, 3.4, 4.2), CFrame.new(0, -0.7, 0), Color3.fromRGB(89, 55, 34), Enum.Material.WoodPlanks)
+		previewPart(world, "Lid", Vector3.new(6.1, 1.5, 4.5), CFrame.new(0, 1.65, 0), Color3.fromRGB(118, 74, 42), Enum.Material.WoodPlanks)
+		previewPart(world, "Band", Vector3.new(1.1, 5.1, 4.7), CFrame.new(0, 0.25, 0), rarity, Enum.Material.Metal)
+		previewPart(world, "Lock", Vector3.new(1.2, 1.3, 0.5), CFrame.new(0, 0.2, -2.3), rarity, Enum.Material.Neon)
+	elseif kind == "WeaponSkin" then
+		previewPart(world, "Handle", Vector3.new(0.7, 3.5, 0.7), CFrame.new(0, -2, 0) * CFrame.Angles(0, 0, math.rad(-28)), Color3.fromRGB(45, 38, 36), Enum.Material.Wood)
+		previewPart(world, "Blade", Vector3.new(0.65, 7, 1.1), CFrame.new(-1.25, 1.5, 0) * CFrame.Angles(0, 0, math.rad(-28)), rarity, Enum.Material.Metal)
+		previewPart(world, "Edge", Vector3.new(0.16, 7.1, 1.15), CFrame.new(-1.54, 1.65, 0) * CFrame.Angles(0, 0, math.rad(-28)), Color3.fromRGB(235, 242, 255), Enum.Material.Neon)
+	elseif kind == "Aura" then
+		for index = 1, 3 do
+			local orb = previewPart(world, "Aura", Vector3.new(1.5, 1.5, 1.5), CFrame.new(math.cos(index * 2.1) * 2.5, math.sin(index * 1.7) * 2.5, 0), rarity, Enum.Material.Neon, Enum.PartType.Ball)
+			orb.Transparency = 0.12
+		end
+		previewPart(world, "Core", Vector3.new(3.5, 3.5, 3.5), CFrame.new(), rarity, Enum.Material.ForceField, Enum.PartType.Ball).Transparency = 0.35
+	elseif kind == "Eyes" then
+		previewPart(world, "Face", Vector3.new(6.2, 4.5, 1.5), CFrame.new(), Color3.fromRGB(218, 183, 156), Enum.Material.SmoothPlastic)
+		for side = -1, 1, 2 do
+			previewPart(world, "Eye", Vector3.new(1.4, 0.75, 0.25), CFrame.new(side * 1.65, 0.35, -0.88), rarity, Enum.Material.Neon, Enum.PartType.Ball)
+		end
+	else
+		previewPart(world, "Torso", Vector3.new(4.6, 5.2, 2.2), CFrame.new(0, -1, 0), rarity, Enum.Material.Fabric)
+		previewPart(world, "Head", Vector3.new(2.8, 2.8, 2.8), CFrame.new(0, 3.1, 0), Color3.fromRGB(218, 183, 156), Enum.Material.SmoothPlastic, Enum.PartType.Ball)
+		previewPart(world, "Accent", Vector3.new(5.1, 1.1, 2.5), CFrame.new(0, 0.1, 0), Color3.fromRGB(28, 31, 42), Enum.Material.Metal)
+	end
+	local camera = Instance.new("Camera")
+	camera.CFrame = CFrame.lookAt(Vector3.new(10, 6, 13), Vector3.new(0, 0.5, 0))
+	camera.FieldOfView = 36
+	camera.Parent = viewport
+	viewport.CurrentCamera = camera
+	return viewport
+end
+
 local function chanceText(chance)
 	chance = tonumber(chance)
 	if not chance then
@@ -453,11 +518,12 @@ function ShopController:ItemCard(entry, order)
 	})
 	local description = entry.Description or entry.Type or "Cosmetico colecionavel"
 	label(card, {
-		Position = UDim2.fromOffset(12, 58), Size = UDim2.new(1, -24, 0, 50),
+		Position = UDim2.fromOffset(12, 58), Size = UDim2.new(1, -116, 0, 64),
 		Text = description, TextColor3 = COLORS.Muted, TextWrapped = true,
 		TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 14,
 	})
+	itemPreview(card, entry, UDim2.new(1, -100, 0, 54), UDim2.fromOffset(88, 82), false)
 	local buttons = create("Frame", {
 		Position = UDim2.new(0, 10, 1, -46), Size = UDim2.new(1, -20, 0, 34),
 		BackgroundTransparency = 1, ZIndex = 14,
@@ -552,11 +618,12 @@ function ShopController:CrateCard(crate, order)
 		end
 	end
 	label(card, {
-		Position = UDim2.fromOffset(12, 58), Size = UDim2.new(1, -24, 0, 70),
+		Position = UDim2.fromOffset(12, 58), Size = UDim2.new(1, -112, 0, 70),
 		Text = #lines > 0 and table.concat(lines, "\n") or "As chances aparecerao antes da abertura.",
 		TextColor3 = COLORS.Muted, TextSize = 10, TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 14,
 	})
+	itemPreview(card, crate, UDim2.new(1, -98, 0, 52), UDim2.fromOffset(86, 80), true)
 	local buttons = create("Frame", {
 		Position = UDim2.new(0, 10, 1, -46), Size = UDim2.new(1, -20, 0, 34), BackgroundTransparency = 1, ZIndex = 14,
 	}, card)

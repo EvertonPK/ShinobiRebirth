@@ -11,8 +11,6 @@ return table.freeze({
 		"QuestRequest",
 		"RebirthRequest",
 		"EquipRequest",
-		"ClanRequest",
-		"ClanState",
 		"StatRequest",
 		"ShopRequest",
 		"ShopState",

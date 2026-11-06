@@ -62,6 +62,7 @@ function HudController:Init(context)
 	self.Remotes = context.Remotes
 	self.Shared = context.Shared
 	self.LootConfig = require(context.Shared:WaitForChild("LootConfig"))
+	self.JourneyConfig = require(context.Shared:WaitForChild("JourneyConfig"))
 	self.Player = Players.LocalPlayer
 	self.Profile = nil
 end
@@ -144,81 +145,9 @@ function HudController:Build()
 	}, notificationRoot)
 	self.NotificationRoot = notificationRoot
 
-	local clanButton = create("TextButton", {
-		Name = "ClanButton",
-		Position = UDim2.fromOffset(20, 148),
-		Size = UDim2.new(1, -40, 0, 48),
-		BackgroundColor3 = COLORS.Panel,
-		BackgroundTransparency = 0.08,
-		BorderSizePixel = 0,
-		Text = "ESCOLHA SEU CLÃ",
-		TextColor3 = COLORS.Text,
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-	}, gui)
-	create("UISizeConstraint", { MaxSize = Vector2.new(315, 48), MinSize = Vector2.new(220, 48) }, clanButton)
-	round(clanButton, 12)
-	stroke(clanButton, Color3.fromRGB(95, 101, 124), 0.35)
-	self.ClanButton = clanButton
-
-	local modal = create("Frame", {
-		Name = "ClanModal",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromScale(0.9, 0.72),
-		BackgroundColor3 = COLORS.Panel,
-		BorderSizePixel = 0,
-		Visible = false,
-		ZIndex = 20,
-	}, gui)
-	create("UISizeConstraint", { MaxSize = Vector2.new(560, 410), MinSize = Vector2.new(300, 310) }, modal)
-	round(modal, 16)
-	stroke(modal, Color3.fromRGB(130, 135, 160), 0.2)
-	label(modal, {
-		Position = UDim2.fromOffset(20, 16), Size = UDim2.new(1, -80, 0, 30),
-		Text = "GUERRA DOS CLÃS", Font = Enum.Font.GothamBold, TextSize = 22, ZIndex = 21,
-	})
-	local clanClose = create("TextButton", {
-		AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -14, 0, 12), Size = UDim2.fromOffset(38, 34),
-		BackgroundColor3 = COLORS.PanelLight, BorderSizePixel = 0, Text = "×", TextColor3 = COLORS.Text,
-		Font = Enum.Font.GothamBold, TextSize = 22, Selectable = true, ZIndex = 22,
-	}, modal)
-	round(clanClose, 9)
-	local list = create("ScrollingFrame", {
-		Position = UDim2.fromOffset(20, 62), Size = UDim2.new(1, -40, 1, -82),
-		BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ZIndex = 21,
-	}, modal)
-	create("UIGridLayout", {
-		CellSize = UDim2.new(0.5, -6, 0, 150),
-		CellPadding = UDim2.fromOffset(12, 12),
-		SortOrder = Enum.SortOrder.Name,
-	}, list)
-	self.ClanModal = modal
-	self.ClanList = list
-	self.ClanClose = clanClose
-	clanButton.Activated:Connect(function()
-		modal.Visible = not modal.Visible
-		if modal.Visible then
-			local remote = self:Remote("ClanRequest")
-			if remote then
-				remote:FireServer("Get")
-			end
-			if UserInputService.GamepadEnabled then
-				GuiService.SelectedObject = clanClose
-			end
-		end
-	end)
-	clanClose.Activated:Connect(function()
-		modal.Visible = false
-		if GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(modal) then
-			GuiService.SelectedObject = clanButton
-		end
-	end)
-
 	local progressButton = create("TextButton", {
 		Name = "ProgressButton",
-		Position = UDim2.fromOffset(20, 208),
+		Position = UDim2.fromOffset(20, 148),
 		Size = UDim2.new(1, -40, 0, 48),
 		BackgroundColor3 = COLORS.Panel,
 		BackgroundTransparency = 0.08,
@@ -328,19 +257,9 @@ function HudController:RenderProgression(profile)
 	local stats = type(profile.Stats) == "table" and profile.Stats or {}
 	local level = math.max(1, tonumber(profile.Level) or 1)
 	self:Section("OBJETIVO PRINCIPAL")
-	local objective
-	if level < 5 then
-		objective = "Treine no Campo de Treino e alcance o nível 5. Cada golpe também avança suas missões diárias."
-	elseif level < 15 then
-		objective = "Patrulhe a zona de inimigos, vença renegados e alcance o nível 15 para se preparar para os chefes."
-	elseif level < 30 then
-		objective = "Entre na primeira arena, derrote o Ronin das Cinzas e resgate as recompensas das missões."
-	elseif level < 60 then
-		objective = "Complete missões diárias, desbloqueie skins e enfrente o ciclo de chefes para fortalecer seu clã."
-	else
-		objective = "Domine os ciclos míticos, colete Essência e prepare-se para renascer no nível 100."
-	end
-	self:Row(objective)
+	local journey = type(profile.Journey) == "table" and profile.Journey or { Stage = 1, Cycle = 1, Progress = 0 }
+	local step = self.JourneyConfig.GetStep(journey.Stage)
+	self:Row(string.format("CICLO %d • %s\n%s  •  %d/%d", tonumber(journey.Cycle) or 1, step.Name, step.Description, tonumber(journey.Progress) or 0, step.Goal))
 	self:Section("ATRIBUTOS  •  " .. statPoints .. " PONTOS DISPONÍVEIS")
 	for _, statName in { "Power", "Chakra", "Defense", "Speed" } do
 		self:Row(string.upper(statName) .. "  •  " .. tostring(stats[statName] or 0), "+1", function()
@@ -386,58 +305,6 @@ function HudController:RenderProgression(profile)
 		local remote = self:Remote("RebirthRequest")
 		if remote then remote:FireServer() end
 	end, level >= 100)
-end
-
-function HudController:UpdateClan(state)
-	if type(state) ~= "table" or type(state.Clans) ~= "table" then
-		return
-	end
-	self.ClanState = state
-	local selectedClan = type(state.Selected) == "string" and state.Selected or ""
-	if selectedClan ~= "" then
-		local clan = state.Clans[selectedClan]
-		if clan then
-			self.ClanButton.Text = string.format("%s  •  %d PONTOS PESSOAIS", string.upper(tostring(clan.Name or selectedClan)), tonumber(state.Contribution) or 0)
-			self.ClanButton.TextColor3 = typeof(clan.Color) == "Color3" and clan.Color or COLORS.Accent
-		end
-	else
-		self.ClanButton.Text = "ESCOLHA SEU CLÃ"
-		self.ClanButton.TextColor3 = COLORS.Text
-	end
-	for _, child in self.ClanList:GetChildren() do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
-	end
-	for id, clan in state.Clans do
-		if type(clan) ~= "table" then
-			continue
-		end
-		local score = type(state.Scores) == "table" and state.Scores[id] or 0
-		local clanColor = typeof(clan.Color) == "Color3" and clan.Color or COLORS.Accent
-		local button = create("TextButton", {
-			Name = tostring(id),
-			BackgroundColor3 = clanColor,
-			BackgroundTransparency = 0.2,
-			BorderSizePixel = 0,
-			Text = string.format("%s\n%s\n%d PONTOS", string.upper(tostring(clan.Name or id)), tostring(clan.Motto or ""), tonumber(score) or 0),
-			TextColor3 = COLORS.Text,
-			TextWrapped = true,
-			Font = Enum.Font.GothamBold,
-			TextSize = 13,
-			ZIndex = 22,
-			AutoButtonColor = selectedClan == "",
-			Selectable = selectedClan == "",
-		}, self.ClanList)
-		round(button, 12)
-		button.Activated:Connect(function()
-			if selectedClan == "" then
-				local remote = self:Remote("ClanRequest")
-				if remote then remote:FireServer("Choose", id) end
-				self.ClanModal.Visible = false
-			end
-		end)
-	end
 end
 
 function HudController:Notify(payload)
@@ -496,7 +363,7 @@ function HudController:UpdateBoss(state)
 	end
 	if state.Active then
 		self.BossFrame.Visible = true
-		self.BossName.Text = string.format("%s  •  FASE %d  •  %s", tostring(state.Name or "Chefe"), tonumber(state.Phase) or 1, string.upper(tostring(state.Mutator or "Normal")))
+		self.BossName.Text = string.format("CICLO %d  •  %s  •  FASE %d  •  %s", tonumber(state.Cycle) or 1, tostring(state.Name or "Chefe"), tonumber(state.Phase) or 1, string.upper(tostring(state.Mutator or "Normal")))
 		self.BossSubtitle.Text = tostring(state.Subtitle or "")
 		self.BossFill.BackgroundColor3 = state.Color or Color3.fromRGB(178, 54, 198)
 		self.BossFill.Size = UDim2.fromScale(math.clamp((tonumber(state.Health) or 0) / math.max(1, tonumber(state.MaxHealth) or 1), 0, 1), 1)
@@ -533,8 +400,6 @@ function HudController:Start()
 	if bossState then bossState.OnClientEvent:Connect(function(state) self:UpdateBoss(state) end) end
 	local notification = self:Remote("Notification")
 	if notification then notification.OnClientEvent:Connect(function(payload) self:Notify(payload) end) end
-	local clanState = self:Remote("ClanState")
-	if clanState then clanState.OnClientEvent:Connect(function(state) self:UpdateClan(state) end) end
 	local worldAction = self:Remote("WorldAction")
 	if worldAction then
 		worldAction.OnClientEvent:Connect(function(action)
@@ -552,9 +417,6 @@ function HudController:Start()
 			if self.ProgressModal.Visible then
 				self.ProgressModal.Visible = false
 				GuiService.SelectedObject = UserInputService.GamepadEnabled and self.ProgressButton or nil
-			elseif self.ClanModal.Visible then
-				self.ClanModal.Visible = false
-				GuiService.SelectedObject = UserInputService.GamepadEnabled and self.ClanButton or nil
 			end
 		end
 	end)
