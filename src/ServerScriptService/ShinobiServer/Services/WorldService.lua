@@ -338,6 +338,64 @@ local function makePortal(parent, id, displayName, position, accent, destination
 	return model
 end
 
+local function makeHolidayTree(parent, position, scale)
+	local model = Instance.new("Model")
+	model.Name = "ChristmasTree"
+	model.Parent = parent
+	part(model, "Trunk", Vector3.new(1.4, 7, 1.4) * scale, CFrame.new(position + Vector3.new(0, 3.5 * scale, 0)), Color3.fromRGB(87, 52, 33), Enum.Material.Wood)
+	for index = 1, 3 do
+		local size = (10 - index * 2) * scale
+		local foliage = part(model, "SnowyPine", Vector3.new(size, size * 0.52, size), CFrame.new(position + Vector3.new(0, (4 + index * 2.7) * scale, 0)), Color3.fromRGB(28, 104, 65), Enum.Material.Grass, Enum.PartType.Ball)
+		foliage.CanCollide = false
+	end
+	local star = part(model, "Star", Vector3.new(1.4, 1.4, 1.4) * scale, CFrame.new(position + Vector3.new(0, 13 * scale, 0)), Color3.fromRGB(255, 215, 74), Enum.Material.Neon, Enum.PartType.Ball)
+	star.CanCollide = false
+	local light = Instance.new("PointLight")
+	light.Color = star.Color
+	light.Brightness = 2
+	light.Range = 18 * scale
+	light.Parent = star
+	for index = 1, 8 do
+		local angle = index * math.pi * 2 / 8
+		local ornament = part(model, "Ornament", Vector3.new(0.55, 0.55, 0.55) * scale, CFrame.new(position + Vector3.new(math.cos(angle) * 3.2 * scale, (5 + index % 3 * 2) * scale, math.sin(angle) * 3.2 * scale)), index % 2 == 0 and Color3.fromRGB(220, 49, 62) or Color3.fromRGB(83, 174, 255), Enum.Material.Neon, Enum.PartType.Ball)
+		ornament.CanCollide = false
+	end
+	return model
+end
+
+local function makeGift(parent, position, color)
+	local model = Instance.new("Model")
+	model.Name = "HolidayGift"
+	model.Parent = parent
+	local box = part(model, "GiftBox", Vector3.new(3.2, 3.2, 3.2), CFrame.new(position + Vector3.new(0, 1.6, 0)), color, Enum.Material.SmoothPlastic)
+	local ribbonA = part(model, "Ribbon", Vector3.new(0.45, 3.4, 3.4), box.CFrame, Color3.fromRGB(255, 221, 88), Enum.Material.Neon)
+	local ribbonB = part(model, "Ribbon", Vector3.new(3.4, 3.4, 0.45), box.CFrame, Color3.fromRGB(255, 221, 88), Enum.Material.Neon)
+	ribbonA.CanCollide = false
+	ribbonB.CanCollide = false
+	return model
+end
+
+local function makeFestivalNpc(parent, name, position, color, promptText, callback)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	local root = part(model, "Root", Vector3.new(3.5, 7, 3), CFrame.new(position + Vector3.new(0, 4, 0)), color, Enum.Material.Fabric)
+	root.CanCollide = false
+	local head = part(model, "Head", Vector3.new(3, 3, 3), CFrame.new(position + Vector3.new(0, 9, 0)), Color3.fromRGB(255, 218, 188), Enum.Material.SmoothPlastic, Enum.PartType.Ball)
+	head.CanCollide = false
+	local hat = part(model, "HolidayHat", Vector3.new(2.7, 2.5, 2.7), CFrame.new(position + Vector3.new(0, 11, 0)), Color3.fromRGB(206, 51, 59), Enum.Material.Fabric, Enum.PartType.Ball)
+	hat.CanCollide = false
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = promptText
+	prompt.ObjectText = name
+	prompt.HoldDuration = 0
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = head
+	prompt.Triggered:Connect(callback)
+	return model
+end
+
 local function makeArena(parent, key, definition)
 	local model = Instance.new("Model")
 	model.Name = key .. "Arena"
@@ -373,8 +431,8 @@ function WorldService:BuildLighting()
 	local atmosphere = Instance.new("Atmosphere")
 	atmosphere.Density = 0.28
 	atmosphere.Offset = 0.15
-	atmosphere.Color = Color3.fromRGB(181, 202, 218)
-	atmosphere.Decay = Color3.fromRGB(76, 89, 115)
+	atmosphere.Color = Color3.fromRGB(210, 229, 244)
+	atmosphere.Decay = Color3.fromRGB(94, 123, 153)
 	atmosphere.Glare = 0.2
 	atmosphere.Haze = 1.6
 	atmosphere:SetAttribute("ShinobiGenerated", true)
@@ -388,9 +446,82 @@ function WorldService:BuildLighting()
 	local correction = Instance.new("ColorCorrectionEffect")
 	correction.Contrast = 0.08
 	correction.Saturation = -0.04
-	correction.TintColor = Color3.fromRGB(255, 241, 226)
+	correction.TintColor = Color3.fromRGB(221, 238, 255)
 	correction:SetAttribute("ShinobiGenerated", true)
 	correction.Parent = Lighting
+end
+
+function WorldService:BuildHolidayFestival(runtime)
+	local festival = Instance.new("Folder")
+	festival.Name = "NatalShinobi"
+	festival.Parent = runtime
+	local snow = Color3.fromRGB(239, 248, 255)
+	local red = Color3.fromRGB(206, 51, 59)
+	local green = Color3.fromRGB(31, 118, 70)
+
+	for _, patchData in {
+		{ Position = Vector3.new(415, -1154, -1587), Size = Vector3.new(110, 0.35, 100) },
+		{ Position = Vector3.new(881, -1180, -1982), Size = Vector3.new(90, 0.35, 90) },
+		{ Position = Vector3.new(240, -1156, -2101), Size = Vector3.new(120, 0.35, 95) },
+		{ Position = Vector3.new(1150, -1016, -3100), Size = Vector3.new(104, 0.25, 104) },
+		{ Position = Vector3.new(1400, -1016, -3100), Size = Vector3.new(104, 0.25, 104) },
+		{ Position = Vector3.new(1650, -1016, -3100), Size = Vector3.new(104, 0.25, 104) },
+	} do
+		local patch = part(festival, "SnowCover", patchData.Size, CFrame.new(patchData.Position), snow, Enum.Material.Snow)
+		patch.CanCollide = false
+	end
+
+	for _, treeData in {
+		{ Position = Vector3.new(415, -1153, -1557), Scale = 1.5 },
+		{ Position = Vector3.new(850, -1180, -1960), Scale = 1.25 },
+		{ Position = Vector3.new(912, -1180, -2007), Scale = 1.1 },
+		{ Position = Vector3.new(220, -1156, -2060), Scale = 1.15 },
+		{ Position = Vector3.new(1150, -1016, -3063), Scale = 1.0 },
+		{ Position = Vector3.new(1400, -1016, -3063), Scale = 1.0 },
+		{ Position = Vector3.new(1650, -1016, -3063), Scale = 1.0 },
+	} do
+		makeHolidayTree(festival, treeData.Position, treeData.Scale)
+	end
+
+	for index = 1, 18 do
+		local angle = index * math.pi * 2 / 18
+		local radius = 38 + (index % 3) * 9
+		makeGift(festival, Vector3.new(415 + math.cos(angle) * radius, -1153, -1587 + math.sin(angle) * radius), index % 2 == 0 and red or green)
+	end
+
+	local notify = function(player, message)
+		self.Context.Remotes.Notification:FireClient(player, { Kind = "Holiday", Text = message })
+	end
+	makeFestivalNpc(festival, "Papai Noel Shinobi", Vector3.new(415, -1153, -1609), red, "Receber missão", function(player)
+		notify(player, "Festival de Natal: complete chefes, missões e baús para ganhar Gemas, Tickets e Tokens de Estilo.")
+	end)
+	makeFestivalNpc(festival, "Mestre das Missões", Vector3.new(240, -1156, -2074), green, "Ver missões", function(player)
+		notify(player, "Missões diárias e objetivos semanais avançam seu nível, temporada e recompensas natalinas.")
+	end)
+	makeFestivalNpc(festival, "Guia dos Chefes", Vector3.new(881, -1180, -2014), Color3.fromRGB(74, 112, 196), "Ver rota", function(player)
+		notify(player, "Os portais festivos levam às arenas. Cada chefe entrega XP, Ryo, Gemas, Tickets e skins.")
+	end)
+
+	local hubs = {
+		Vector3.new(842, -1179, -1950), Vector3.new(882, -1179, -1950),
+		Vector3.new(922, -1179, -1950), Vector3.new(962, -1179, -1950),
+	}
+	for index, bossId in BossConfig.Order do
+		local definition = BossConfig.Definitions[bossId]
+		local target = definition.ImportedArena or definition.Arena
+		makePortal(festival, bossId .. "HolidayPortal", definition.DisplayName, hubs[index], definition.Palette.Accent, target + Vector3.new(0, 4, 32), target, "Ir ao chefe")
+	end
+	for _, definition in BossConfig.Definitions do
+		local position = definition.ImportedArena or definition.Arena
+		local beacon = part(festival, "BossHolidayBeacon", Vector3.new(3, 11, 3), CFrame.new(position + Vector3.new(0, 5, -38)), definition.Palette.Accent, Enum.Material.Neon)
+		beacon.CanCollide = false
+		local light = Instance.new("PointLight")
+		light.Color = definition.Palette.Accent
+		light.Brightness = 2
+		light.Range = 20
+		light.Parent = beacon
+	end
+	workspace:SetAttribute("HolidayTheme", "Natal Shinobi")
 end
 
 function WorldService:BuildImportedRuntime(imported)
@@ -414,6 +545,7 @@ function WorldService:BuildImportedRuntime(imported)
 		dummy:SetAttribute("Health", 500)
 		dummy:SetAttribute("CombatTarget", true)
 	end
+	self:BuildHolidayFestival(runtime)
 
 	imported:SetAttribute("ShinobiMapReady", true)
 	self:BuildLighting()

@@ -56,6 +56,7 @@ local TEMPLATE = {
 	ProcessedReceipts = {},
 	StorePurchases = {},
 	Achievements = {},
+	Milestones = {},
 	RedeemedCodes = {},
 	LiveOps = {
 		Login = { LastClaimDay = -1, Streak = 0, GraceTokens = 1, LastGraceDay = -1 },
@@ -94,6 +95,7 @@ local function publicSnapshot(profile)
 		Quests = Util.DeepCopy(profile.Quests),
 		LiveOps = Util.DeepCopy(profile.LiveOps),
 		Achievements = Util.DeepCopy(profile.Achievements),
+	Milestones = Util.DeepCopy(profile.Milestones),
 		RedeemedCodes = Util.DeepCopy(profile.RedeemedCodes),
 	}
 end

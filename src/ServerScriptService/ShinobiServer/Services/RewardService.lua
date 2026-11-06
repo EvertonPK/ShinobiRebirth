@@ -56,6 +56,8 @@ function RewardService:AwardBoss(player, bossId, rewardMultiplier)
 	local multiplier = (rewardMultiplier or 1) * tierConfig.Rewards * liveOpsMultiplier
 	local xp = math.floor((500 + definition.BaseHealth * 0.04) * multiplier)
 	local ryo = math.floor((650 + definition.BaseHealth * 0.055) * multiplier)
+	local bonusGems = math.max(2, math.floor((2 + tier) * multiplier))
+	local bonusTickets = math.max(1, math.floor((1 + tier) * multiplier))
 	local drops = {}
 	self.Profiles:Mutate(player, function(data)
 		data.BossKills[bossId] = (data.BossKills[bossId] or 0) + 1
@@ -67,11 +69,15 @@ function RewardService:AwardBoss(player, bossId, rewardMultiplier)
 	end)
 	self.Progression:AddXP(player, xp)
 	self.Progression:AddRyo(player, ryo)
+	self.Profiles:Mutate(player, function(data)
+		data.Gems += bonusGems
+		data.EventTickets += bonusTickets
+	end)
 	self.Quests:Record(player, "BossKill", 1)
 	self.Clans:AddContribution(player, math.floor(100 * multiplier))
 	self.Remotes.Notification:FireClient(player, {
 		Kind = "BossReward",
-		Text = string.format("%s derrotado: +%d XP, +%d Ryo", definition.DisplayName, xp, ryo),
+		Text = string.format("%s derrotado: +%d XP, +%d Ryo, +%d Gemas, +%d Tickets", definition.DisplayName, xp, ryo, bonusGems, bonusTickets),
 		Drops = drops,
 	})
 end

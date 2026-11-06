@@ -96,6 +96,20 @@ function ProgressionService:AddXP(player, amount)
 			profile.XP -= needed
 			profile.Level += 1
 			profile.StatPoints += GameConfig.StatPointsForLevel(profile.Level)
+			local milestone = GameConfig.LevelMilestones[profile.Level]
+			local milestoneId = "Level_" .. profile.Level
+			if milestone and not profile.Milestones[milestoneId] then
+				profile.Milestones[milestoneId] = os.time()
+				for currency, reward in milestone do
+					if type(profile[currency]) == "number" and type(reward) == "number" then
+						profile[currency] += math.max(0, math.floor(reward))
+					end
+				end
+				self.Remotes.Notification:FireClient(player, {
+					Kind = "Milestone",
+					Text = string.format("%s: recompensas garantidas recebidas!", milestone.Text or "Marco de nível"),
+				})
+			end
 			self.Remotes.Notification:FireClient(player, {
 				Kind = "LevelUp",
 				Text = "Nível " .. profile.Level .. " alcançado!",

@@ -15,6 +15,14 @@ GameConfig.RebirthLevel = 100
 GameConfig.BossIntermission = 35
 GameConfig.BossTimeLimit = 420
 
+GameConfig.LevelMilestones = {
+	[10] = { Ryo = 1500, Gems = 10, EventTickets = 2, Text = "Recompensa Genin" },
+	[25] = { Ryo = 5000, Gems = 25, EventTickets = 5, StyleTokens = 3, Text = "Recompensa Chunin" },
+	[45] = { Ryo = 12000, Gems = 50, EventTickets = 10, StyleTokens = 8, Text = "Recompensa Jonin" },
+	[70] = { Ryo = 28000, Gems = 100, EventTickets = 20, StyleTokens = 16, Text = "Recompensa Anbu" },
+	[100] = { Ryo = 60000, Gems = 200, EventTickets = 35, StyleTokens = 30, Essence = 8, Text = "Recompensa Kage" },
+}
+
 GameConfig.Ranks = {
 	{ Name = "Academy", Level = 1, Color = Color3.fromRGB(175, 175, 175) },
 	{ Name = "Genin", Level = 10, Color = Color3.fromRGB(106, 190, 92) },

@@ -86,13 +86,15 @@ end
 function EnemyService:Spawn(index, spawn)
 	local definition = EnemyConfig[spawn.Id]
 	local model, humanoid = buildEnemy(spawn.Id, definition, spawn.Position)
-	local tier = 1
+	local tiers = {}
 	for player in self.Profiles.Profiles do
 		local profile = self.Profiles:Get(player)
 		if profile then
-			tier = math.max(tier, GameConfig.GetWorldTier(profile.Rebirths))
+			table.insert(tiers, GameConfig.GetWorldTier(profile.Rebirths))
 		end
 	end
+	table.sort(tiers)
+	local tier = tiers[math.ceil(#tiers * 0.5)] or 1
 	local scale = GameConfig.WorldTiers[tier]
 	humanoid.MaxHealth = math.floor(definition.Health * scale.Health)
 	humanoid.Health = humanoid.MaxHealth

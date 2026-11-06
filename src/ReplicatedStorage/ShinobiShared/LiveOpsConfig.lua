@@ -5,6 +5,7 @@ LiveOpsConfig.SeasonPointsPerLevel = 100
 LiveOpsConfig.SeasonMaxLevel = 30
 
 LiveOpsConfig.DailyEvents = {
+	{ Id = "WinterFestival", Name = "Festival de Natal Shinobi", Description = "O vilarejo está coberto de neve: chefes, missões e baús rendem mais durante o festival.", Modifiers = { XP = 1.35, Ryo = 1.35, BossReward = 1.4, LootLuck = 1.25, Mastery = 1.2 } },
 	{ Id = "TrainingFrenzy", Name = "Treino Intensivo", Description = "XP e Ryo aumentados durante todo o dia.", Modifiers = { XP = 1.5, Ryo = 1.25, BossReward = 1, LootLuck = 1 } },
 	{ Id = "BossRush", Name = "Investida dos Chefes", Description = "Chefes rendem mais recompensas e mutadores melhores.", Modifiers = { XP = 1.15, Ryo = 1.2, BossReward = 1.6, LootLuck = 1.2 } },
 	{ Id = "BountyHunt", Name = "Caçada aos Renegados", Description = "Inimigos de campo concedem XP e Ryo adicionais.", Modifiers = { XP = 1.35, Ryo = 1.5, BossReward = 1, LootLuck = 1.05 } },

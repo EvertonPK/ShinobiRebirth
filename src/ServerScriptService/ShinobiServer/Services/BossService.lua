@@ -114,14 +114,16 @@ function BossService:Init(context)
 end
 
 function BossService:GetServerTier()
-	local tier = 1
+	local tiers = {}
 	for player in self.Profiles.Profiles do
 		local profile = self.Profiles:Get(player)
 		if profile then
-			tier = math.max(tier, GameConfig.GetWorldTier(profile.Rebirths))
+			table.insert(tiers, GameConfig.GetWorldTier(profile.Rebirths))
 		end
 	end
-	return tier
+	if #tiers == 0 then return 1 end
+	table.sort(tiers)
+	return tiers[math.ceil(#tiers * 0.5)]
 end
 
 function BossService:GetArenaPosition(definition)
@@ -487,7 +489,9 @@ function BossService:Spawn(bossId)
 	local tier = self:GetServerTier()
 	local tierConfig = GameConfig.WorldTiers[tier]
 	local model, humanoid = buildBossModel(bossId, definition, self:GetArenaPosition(definition))
-	local health = math.floor(definition.BaseHealth * tierConfig.Health * mutator.Health * (1 + math.max(0, #Players:GetPlayers() - 1) * 0.45))
+	local cycleScale = 1 + math.min(1.2, math.max(0, self.Cycle - 1) * 0.04)
+	local cycleReward = 1 + math.min(0.5, math.max(0, self.Cycle - 1) * 0.025)
+	local health = math.floor(definition.BaseHealth * tierConfig.Health * mutator.Health * cycleScale * (1 + math.max(0, #Players:GetPlayers() - 1) * 0.45))
 	humanoid.MaxHealth = health
 	humanoid.Health = health
 	model.Parent = workspace:WaitForChild("ShinobiWorld")
@@ -498,8 +502,9 @@ function BossService:Spawn(bossId)
 		Tier = tier,
 		Model = model,
 		Humanoid = humanoid,
-		Damage = math.floor(definition.BaseDamage * tierConfig.Damage * mutator.Damage),
+		Damage = math.floor(definition.BaseDamage * tierConfig.Damage * mutator.Damage * (1 + (cycleScale - 1) * 0.45)),
 		Speed = 22 * mutator.Speed,
+		CycleReward = cycleReward,
 		Phase = 1,
 		DamageByUser = {},
 		StartedAt = os.clock(),
@@ -529,7 +534,7 @@ function BossService:Spawn(bossId)
 		for _, player in Players:GetPlayers() do
 			local contribution = active.DamageByUser[player.UserId] or 0
 			if contribution >= humanoid.MaxHealth * 0.01 then
-				self.Rewards:AwardBoss(player, bossId, mutator.Reward)
+				self.Rewards:AwardBoss(player, bossId, mutator.Reward * active.CycleReward)
 			end
 		end
 		task.delay(5, function()
