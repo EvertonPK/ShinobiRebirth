@@ -11,6 +11,10 @@ Projeto Roblox estruturado para desenvolvimento com Rojo. A versão nova preserv
 5. Faça Rebirth para ganhar Essência permanente e elevar o nível do mundo.
 6. Continue em ciclos mais difíceis, com novas combinações de mutadores e recompensas.
 
+## Mapa
+
+A Vila Shinobi funciona como hub e reúne residência central, academia, clínica, mercado, dojo, salão de clã e treino. Quatro regiões exploráveis saem dela: Fronteira das Cinzas com vulcão, Planalto da Tempestade com torre elétrica, Bosque Ancestral com santuário e Pântano do Vazio com ruínas. Cada região possui rota, inimigos, portal e arena de chefe.
+
 ## Estrutura
 
 - `src/ReplicatedStorage/ShinobiShared`: configurações e módulos compartilhados.

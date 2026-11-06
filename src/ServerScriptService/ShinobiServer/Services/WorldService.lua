@@ -77,6 +77,171 @@ local function makeTorii(parent, position, rotation, accent)
 	return model
 end
 
+local function makeSign(parent, textValue, position, accent)
+	local sign = part(parent, "Signpost", Vector3.new(12, 4, 0.6), CFrame.new(position + Vector3.new(0, 5, 0)), Color3.fromRGB(42, 30, 25), Enum.Material.Wood)
+	part(parent, "SignPost", Vector3.new(0.8, 7, 0.8), CFrame.new(position + Vector3.new(0, 1.5, 0)), Color3.fromRGB(75, 50, 38), Enum.Material.Wood)
+	local board = Instance.new("BillboardGui")
+	board.Adornee = sign
+	board.Size = UDim2.fromOffset(210, 44)
+	board.AlwaysOnTop = true
+	board.Parent = sign
+	local text = Instance.new("TextLabel")
+	text.Size = UDim2.fromScale(1, 1)
+	text.BackgroundTransparency = 1
+	text.Text = string.upper(textValue)
+	text.TextColor3 = accent
+	text.TextStrokeTransparency = 0.35
+	text.Font = Enum.Font.GothamBold
+	text.TextScaled = true
+	text.Parent = board
+end
+
+local function makeLantern(parent, position, accent)
+	local model = Instance.new("Model")
+	model.Name = "VillageLantern"
+	model.Parent = parent
+	part(model, "Post", Vector3.new(0.55, 7, 0.55), CFrame.new(position + Vector3.new(0, 3.5, 0)), Color3.fromRGB(54, 38, 30), Enum.Material.Wood)
+	local lamp = part(model, "Lamp", Vector3.new(1.6, 1.6, 1.6), CFrame.new(position + Vector3.new(0, 7, 0)), accent, Enum.Material.Neon, Enum.PartType.Ball)
+	lamp.CanCollide = false
+	local light = Instance.new("PointLight")
+	light.Color = accent
+	light.Brightness = 1.3
+	light.Range = 15
+	light.Parent = lamp
+end
+
+local function makeHouse(parent, name, position, scale, wallColor, roofColor)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	local width, depth, height = 18 * scale, 15 * scale, 11 * scale
+	part(model, "Foundation", Vector3.new(width + 2, 1.2, depth + 2), CFrame.new(position + Vector3.new(0, 0.6, 0)), Color3.fromRGB(84, 83, 76), Enum.Material.Slate)
+	part(model, "MainRoom", Vector3.new(width, height, depth), CFrame.new(position + Vector3.new(0, height * 0.5 + 1.2, 0)), wallColor, Enum.Material.WoodPlanks)
+	part(model, "RoofLeft", Vector3.new(width * 0.62, 1.5, depth + 3), CFrame.new(position + Vector3.new(-width * 0.2, height + 3.1, 0)) * CFrame.Angles(0, 0, math.rad(22)), roofColor, Enum.Material.Slate)
+	part(model, "RoofRight", Vector3.new(width * 0.62, 1.5, depth + 3), CFrame.new(position + Vector3.new(width * 0.2, height + 3.1, 0)) * CFrame.Angles(0, 0, math.rad(-22)), roofColor, Enum.Material.Slate)
+	local door = part(model, "Door", Vector3.new(3.6 * scale, 6.5 * scale, 0.35), CFrame.new(position + Vector3.new(0, 4.45 * scale + 1.2, -depth * 0.5 - 0.2)), Color3.fromRGB(53, 35, 28), Enum.Material.Wood)
+	door.CanCollide = false
+	for side = -1, 1, 2 do
+		local window = part(model, "Window", Vector3.new(3.2 * scale, 2.8 * scale, 0.22), CFrame.new(position + Vector3.new(side * width * 0.28, height * 0.64 + 1.2, -depth * 0.5 - 0.23)), Color3.fromRGB(255, 194, 96), Enum.Material.Neon)
+		window.Transparency = 0.3
+		window.CanCollide = false
+	end
+	return model
+end
+
+local function makeStall(parent, name, position, accent)
+	local model = Instance.new("Model")
+	model.Name = name
+	model.Parent = parent
+	part(model, "Counter", Vector3.new(11, 3, 4), CFrame.new(position + Vector3.new(0, 2, 0)), Color3.fromRGB(83, 54, 38), Enum.Material.Wood)
+	part(model, "Awning", Vector3.new(13, 0.45, 6), CFrame.new(position + Vector3.new(0, 7, 0)), accent, Enum.Material.Fabric)
+	for x = -1, 1, 2 do
+		part(model, "Post", Vector3.new(0.45, 7, 0.45), CFrame.new(position + Vector3.new(x * 5, 3.5, 1.8)), Color3.fromRGB(63, 42, 31), Enum.Material.Wood)
+	end
+	for index = -2, 2 do
+		local item = part(model, "MarketGood", Vector3.new(1.1, 1.1, 1.1), CFrame.new(position + Vector3.new(index * 1.8, 4.1, -0.8)), index % 2 == 0 and accent or Color3.fromRGB(224, 187, 105), Enum.Material.SmoothPlastic, Enum.PartType.Ball)
+		item.CanCollide = false
+	end
+	return model
+end
+
+local function makeRock(parent, position, scale, color, material)
+	local rock = part(parent, "Rock", Vector3.new(4, 3, 3) * scale, CFrame.new(position) * CFrame.Angles(math.rad(12 * scale), math.rad(26 * scale), math.rad(8)), color, material or Enum.Material.Slate, Enum.PartType.Ball)
+	rock.CanCollide = true
+	return rock
+end
+
+local function makeBridge(parent, position, length, rotation, accent)
+	local model = Instance.new("Model")
+	model.Name = "WoodenBridge"
+	model.Parent = parent
+	local base = CFrame.new(position) * CFrame.Angles(0, math.rad(rotation), 0)
+	for index = -math.floor(length / 3), math.floor(length / 3) do
+		part(model, "Plank", Vector3.new(2.7, 0.45, 5.2), base * CFrame.new(index * 3, 0, 0), Color3.fromRGB(108, 70, 43), Enum.Material.WoodPlanks)
+	end
+	for side = -1, 1, 2 do
+		part(model, "Rail", Vector3.new(length + 3, 1, 0.45), base * CFrame.new(0, 2, side * 3), accent, Enum.Material.Wood)
+	end
+	return model
+end
+
+local function makeBiome(parent, name, center, palette, treeCount, landmark)
+	local biome = Instance.new("Folder")
+	biome.Name = name
+	biome.Parent = parent
+	part(biome, "BiomeGround", Vector3.new(250, 2, 220), CFrame.new(center + Vector3.new(0, -1.2, 0)), palette.Ground, palette.GroundMaterial)
+	for index = 1, treeCount do
+		local angle = index * 2.399963
+		local radius = 24 + (index % 8) * 13
+		makeTree(biome, center + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius), 0.7 + (index % 4) * 0.15, palette.Tree)
+	end
+	for index = 1, 16 do
+		local angle = index * 1.73
+		local radius = 35 + (index % 6) * 18
+		makeRock(biome, center + Vector3.new(math.cos(angle) * radius, 2, math.sin(angle) * radius), 0.7 + (index % 3) * 0.2, palette.Rock, palette.RockMaterial)
+	end
+	makeSign(biome, landmark, center + Vector3.new(0, 0, -86), palette.Accent)
+	return biome
+end
+
+local function makeVolcano(parent, position)
+	local model = Instance.new("Model")
+	model.Name = "EmberVolcano"
+	model.Parent = parent
+	for level = 1, 5 do
+		local radius = 52 - level * 8
+		local ring = cylinder(model, "BasaltRing", Vector3.new(10, radius, radius), CFrame.new(position + Vector3.new(0, level * 6, 0)), Color3.fromRGB(62 + level * 5, 43, 39), Enum.Material.Slate)
+		ring.CanCollide = true
+	end
+	local lava = cylinder(model, "LavaCrater", Vector3.new(1.1, 15, 15), CFrame.new(position + Vector3.new(0, 33, 0)), Color3.fromRGB(255, 91, 38), Enum.Material.Neon)
+	lava.CanCollide = false
+	local light = Instance.new("PointLight")
+	light.Color = lava.Color
+	light.Brightness = 3
+	light.Range = 32
+	light.Parent = lava
+end
+
+local function makeStormTower(parent, position)
+	local model = Instance.new("Model")
+	model.Name = "StormWatchtower"
+	model.Parent = parent
+	cylinder(model, "TowerBase", Vector3.new(38, 10, 10), CFrame.new(position + Vector3.new(0, 19, 0)), Color3.fromRGB(49, 69, 113), Enum.Material.Slate)
+	for index = 1, 4 do
+		local angle = index * math.pi * 0.5
+		local crystal = part(model, "ThunderCrystal", Vector3.new(2, 11, 2), CFrame.new(position + Vector3.new(math.cos(angle) * 12, 10, math.sin(angle) * 12)) * CFrame.Angles(math.rad(18), 0, math.rad(18)), Color3.fromRGB(112, 224, 255), Enum.Material.Neon)
+		crystal.CanCollide = false
+	end
+	local beacon = part(model, "StormBeacon", Vector3.new(5, 5, 5), CFrame.new(position + Vector3.new(0, 40, 0)), Color3.fromRGB(151, 239, 255), Enum.Material.Neon, Enum.PartType.Ball)
+	beacon.CanCollide = false
+end
+
+local function makeGroveShrine(parent, position)
+	local model = Instance.new("Model")
+	model.Name = "AncestorShrine"
+	model.Parent = parent
+	makeTree(model, position, 2.5, { Trunk = Color3.fromRGB(83, 66, 41), Leaf = Color3.fromRGB(117, 190, 91) })
+	cylinder(model, "ShrinePlatform", Vector3.new(2.2, 32, 32), CFrame.new(position + Vector3.new(0, 0.5, 0)), Color3.fromRGB(75, 117, 67), Enum.Material.Grass)
+	for index = 1, 6 do
+		local angle = index * math.pi * 2 / 6
+		local rune = part(model, "Rune", Vector3.new(1.2, 3.5, 1.2), CFrame.new(position + Vector3.new(math.cos(angle) * 16, 3, math.sin(angle) * 16)), Color3.fromRGB(174, 255, 123), Enum.Material.Neon)
+		rune.CanCollide = false
+	end
+end
+
+local function makeVoidRuins(parent, position)
+	local model = Instance.new("Model")
+	model.Name = "VoidRuins"
+	model.Parent = parent
+	cylinder(model, "RiftPool", Vector3.new(0.8, 26, 26), CFrame.new(position + Vector3.new(0, 0.1, 0)), Color3.fromRGB(105, 44, 139), Enum.Material.Neon)
+	for index = 1, 8 do
+		local angle = index * math.pi * 2 / 8
+		local obelisk = part(model, "VoidObelisk", Vector3.new(3, 18 + (index % 3) * 5, 3), CFrame.new(position + Vector3.new(math.cos(angle) * 27, 9, math.sin(angle) * 27)) * CFrame.Angles(0, angle, math.rad(8)), Color3.fromRGB(49, 28, 68), Enum.Material.Slate)
+		local glyph = part(model, "VoidGlyph", Vector3.new(0.25, 4, 2), obelisk.CFrame * CFrame.new(0, 2, -1.6), Color3.fromRGB(235, 108, 255), Enum.Material.Neon)
+		glyph.CanCollide = false
+	end
+end
+
 local function safeTeleport(player, destination, lookAt)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -259,6 +424,65 @@ function WorldService:BuildWorld()
 		local radius = 100 + (index % 7) * 24
 		makeTree(world, Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius), 0.75 + (index % 4) * 0.1, treePalette)
 	end
+
+	local village = Instance.new("Folder")
+	village.Name = "HiddenLeafVillage"
+	village.Parent = world
+	part(village, "MainRoadNorth", Vector3.new(22, 0.5, 190), CFrame.new(0, 1.2, 89), Color3.fromRGB(154, 143, 126), Enum.Material.Cobblestone)
+	part(village, "MainRoadEast", Vector3.new(190, 0.5, 20), CFrame.new(90, 1.2, 0), Color3.fromRGB(154, 143, 126), Enum.Material.Cobblestone)
+	part(village, "MainRoadWest", Vector3.new(190, 0.5, 20), CFrame.new(-90, 1.2, 0), Color3.fromRGB(154, 143, 126), Enum.Material.Cobblestone)
+	part(village, "MainRoadSouth", Vector3.new(22, 0.5, 180), CFrame.new(0, 1.2, -114), Color3.fromRGB(154, 143, 126), Enum.Material.Cobblestone)
+	makeHouse(village, "HokageResidence", Vector3.new(0, 0, 58), 1.15, Color3.fromRGB(206, 183, 148), Color3.fromRGB(145, 44, 37))
+	makeHouse(village, "NinjaAcademy", Vector3.new(-62, 0, 12), 0.92, Color3.fromRGB(194, 174, 139), Color3.fromRGB(56, 85, 128))
+	makeHouse(village, "VillageClinic", Vector3.new(62, 0, 12), 0.88, Color3.fromRGB(211, 204, 181), Color3.fromRGB(67, 130, 92))
+	makeHouse(village, "Dojo", Vector3.new(-62, 0, -53), 0.84, Color3.fromRGB(177, 143, 104), Color3.fromRGB(88, 56, 43))
+	makeHouse(village, "GuildHall", Vector3.new(62, 0, -53), 0.84, Color3.fromRGB(170, 151, 132), Color3.fromRGB(78, 47, 104))
+	makeStall(village, "RyoMarket", Vector3.new(-27, 0, -12), Color3.fromRGB(226, 115, 55))
+	makeStall(village, "CosmeticMarket", Vector3.new(27, 0, -12), Color3.fromRGB(115, 192, 239))
+	makeSign(village, "Academia", Vector3.new(-62, 0, -2), Color3.fromRGB(115, 192, 239))
+	makeSign(village, "Clínica", Vector3.new(62, 0, -2), Color3.fromRGB(113, 225, 143))
+	makeSign(village, "Mercado Shinobi", Vector3.new(0, 0, -28), Color3.fromRGB(255, 191, 83))
+	for index = 1, 18 do
+		local angle = index * math.pi * 2 / 18
+		makeLantern(village, Vector3.new(math.cos(angle) * 76, 0, math.sin(angle) * 76), index % 2 == 0 and Color3.fromRGB(255, 187, 83) or Color3.fromRGB(255, 117, 72))
+	end
+
+	local regions = Instance.new("Folder")
+	regions.Name = "ShinobiRegions"
+	regions.Parent = world
+	makeBiome(regions, "AshenFrontier", Vector3.new(0, 0, 235), {
+		Ground = Color3.fromRGB(73, 48, 41), GroundMaterial = Enum.Material.Ground,
+		Tree = { Trunk = Color3.fromRGB(63, 39, 32), Leaf = Color3.fromRGB(154, 55, 32) },
+		Rock = Color3.fromRGB(83, 56, 50), RockMaterial = Enum.Material.Slate, Accent = Color3.fromRGB(255, 126, 54),
+	}, 12, "Fronteira das Cinzas")
+	makeBiome(regions, "StormHighlands", Vector3.new(235, 0, 0), {
+		Ground = Color3.fromRGB(50, 62, 96), GroundMaterial = Enum.Material.Rock,
+		Tree = { Trunk = Color3.fromRGB(44, 54, 78), Leaf = Color3.fromRGB(91, 146, 202) },
+		Rock = Color3.fromRGB(58, 72, 112), RockMaterial = Enum.Material.Slate, Accent = Color3.fromRGB(115, 215, 255),
+	}, 10, "Planalto da Tempestade")
+	makeBiome(regions, "AncientGrove", Vector3.new(-235, 0, 0), {
+		Ground = Color3.fromRGB(52, 91, 58), GroundMaterial = Enum.Material.Grass,
+		Tree = { Trunk = Color3.fromRGB(80, 62, 42), Leaf = Color3.fromRGB(109, 174, 83) },
+		Rock = Color3.fromRGB(76, 112, 66), RockMaterial = Enum.Material.Grass, Accent = Color3.fromRGB(179, 255, 122),
+	}, 24, "Bosque Ancestral")
+	makeBiome(regions, "VoidMarsh", Vector3.new(0, 0, -235), {
+		Ground = Color3.fromRGB(43, 31, 59), GroundMaterial = Enum.Material.Mud,
+		Tree = { Trunk = Color3.fromRGB(45, 33, 56), Leaf = Color3.fromRGB(100, 53, 126) },
+		Rock = Color3.fromRGB(67, 43, 89), RockMaterial = Enum.Material.Slate, Accent = Color3.fromRGB(228, 98, 255),
+	}, 15, "Pântano do Vazio")
+	makeVolcano(regions, Vector3.new(0, 0, 155))
+	makeStormTower(regions, Vector3.new(152, 0, -72))
+	makeGroveShrine(regions, Vector3.new(-152, 0, -72))
+	makeVoidRuins(regions, Vector3.new(0, 0, -286))
+
+	local river = part(world, "MoonRiver", Vector3.new(130, 0.35, 22), CFrame.new(0, -0.15, -145), Color3.fromRGB(54, 147, 184), Enum.Material.Glass)
+	river.Transparency = 0.34
+	river.CanCollide = false
+	makeBridge(world, Vector3.new(0, 1.15, -145), 28, 90, Color3.fromRGB(88, 57, 41))
+	makeTorii(world, Vector3.new(0, 0, -192), 180, Color3.fromRGB(99, 54, 129))
+	makeTorii(world, Vector3.new(0, 0, 168), 0, Color3.fromRGB(163, 57, 37))
+	makeTorii(world, Vector3.new(170, 0, 0), 90, Color3.fromRGB(56, 98, 163))
+	makeTorii(world, Vector3.new(-170, 0, 0), -90, Color3.fromRGB(67, 132, 72))
 
 	local arenas = Instance.new("Folder")
 	arenas.Name = "BossArenas"
