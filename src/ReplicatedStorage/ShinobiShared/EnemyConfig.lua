@@ -1,0 +1,38 @@
+return table.freeze({
+	Rogue = {
+		Name = "Shinobi Renegado",
+		Health = 260,
+		Damage = 8,
+		XP = 45,
+		Ryo = 32,
+		Color = Color3.fromRGB(73, 77, 88),
+		Accent = Color3.fromRGB(195, 59, 66),
+	},
+	AshDisciple = {
+		Name = "Discípulo das Cinzas",
+		Health = 440,
+		Damage = 12,
+		XP = 75,
+		Ryo = 55,
+		Color = Color3.fromRGB(85, 45, 36),
+		Accent = Color3.fromRGB(244, 116, 42),
+	},
+	StormAcolyte = {
+		Name = "Acólito da Tempestade",
+		Health = 620,
+		Damage = 15,
+		XP = 105,
+		Ryo = 80,
+		Color = Color3.fromRGB(35, 54, 96),
+		Accent = Color3.fromRGB(106, 211, 255),
+	},
+	VoidWalker = {
+		Name = "Caminhante do Vazio",
+		Health = 950,
+		Damage = 21,
+		XP = 160,
+		Ryo = 125,
+		Color = Color3.fromRGB(37, 27, 50),
+		Accent = Color3.fromRGB(213, 81, 246),
+	},
+})

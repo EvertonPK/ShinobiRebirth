@@ -1,0 +1,39 @@
+{
+  "name": "ShinobiRebirth",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "ShinobiShared": {
+        "$path": "src/ReplicatedStorage/ShinobiShared"
+      }
+    },
+    "ServerScriptService": {
+      "ShinobiServer": {
+        "$path": "src/ServerScriptService/ShinobiServer"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "ShinobiClient": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/ShinobiClient"
+        }
+      }
+    },
+    "Workspace": {
+      "$properties": {
+        "StreamingEnabled": true,
+        "FallenPartsDestroyHeight": -250
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "Technology": "Future",
+        "ClockTime": 17.5,
+        "Brightness": 2.4,
+        "EnvironmentDiffuseScale": 0.35,
+        "EnvironmentSpecularScale": 0.65,
+        "GlobalShadows": true
+      }
+    }
+  }
+}
