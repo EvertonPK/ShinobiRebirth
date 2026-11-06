@@ -2,6 +2,7 @@
 *.rbxlx
 *.rbxm
 *.rbxmx
+*.zip
 *.lock
 .DS_Store
 sourcemap.json
