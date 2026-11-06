@@ -393,7 +393,38 @@ function WorldService:BuildLighting()
 	correction.Parent = Lighting
 end
 
+function WorldService:BuildImportedRuntime(imported)
+	local existing = Workspace:FindFirstChild("ShinobiWorld")
+	if existing then
+		existing:Destroy()
+	end
+	local runtime = Instance.new("Folder")
+	runtime.Name = "ShinobiWorld"
+	runtime.Parent = Workspace
+	runtime:SetAttribute("UsesImportedMap", true)
+	self.World = runtime
+
+	local training = Instance.new("Folder")
+	training.Name = "TrainingGround"
+	training.Parent = runtime
+	for index = 1, 6 do
+		local location = Vector3.new(250 + (index - 3) * 18, -1161, -1620)
+		local dummy = part(training, "TrainingDummy", Vector3.new(4, 10, 4), CFrame.new(location), Color3.fromRGB(112, 76, 51), Enum.Material.Wood)
+		dummy:SetAttribute("MaxHealth", 500)
+		dummy:SetAttribute("Health", 500)
+		dummy:SetAttribute("CombatTarget", true)
+	end
+
+	imported:SetAttribute("ShinobiMapReady", true)
+	self:BuildLighting()
+end
+
 function WorldService:BuildWorld()
+	local imported = Workspace:FindFirstChild("ImportedMapBase")
+	if imported then
+		self:BuildImportedRuntime(imported)
+		return
+	end
 	local old = Workspace:FindFirstChild("ShinobiWorld")
 	if old then
 		old:Destroy()

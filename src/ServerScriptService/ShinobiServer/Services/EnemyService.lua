@@ -23,6 +23,21 @@ local SPAWNS = {
 	{ Id = "VoidWalker", Position = Vector3.new(-80, 6, -330) },
 }
 
+local IMPORTED_MAP_SPAWNS = {
+	{ Id = "Rogue", Position = Vector3.new(214, -1163, -1620) },
+	{ Id = "Rogue", Position = Vector3.new(232, -1163, -1620) },
+	{ Id = "Rogue", Position = Vector3.new(268, -1163, -1620) },
+	{ Id = "AshDisciple", Position = Vector3.new(460, -1160, -1840) },
+	{ Id = "AshDisciple", Position = Vector3.new(510, -1160, -1885) },
+	{ Id = "AshDisciple", Position = Vector3.new(560, -1160, -1840) },
+	{ Id = "StormAcolyte", Position = Vector3.new(1220, -1017, -3060) },
+	{ Id = "StormAcolyte", Position = Vector3.new(1280, -1017, -3040) },
+	{ Id = "StormAcolyte", Position = Vector3.new(1340, -1017, -3060) },
+	{ Id = "VoidWalker", Position = Vector3.new(1570, -1017, -3100) },
+	{ Id = "VoidWalker", Position = Vector3.new(1615, -1017, -3140) },
+	{ Id = "VoidWalker", Position = Vector3.new(1680, -1017, -3170) },
+}
+
 local function makePart(model, name, size, cframe, color, material, shape)
 	local object = Instance.new("Part")
 	object.Name = name
@@ -198,7 +213,8 @@ end
 
 function EnemyService:Start()
 	workspace:WaitForChild("ShinobiWorld")
-	for index, spawn in SPAWNS do
+	local spawns = workspace:FindFirstChild("ImportedMapBase") and IMPORTED_MAP_SPAWNS or SPAWNS
+	for index, spawn in spawns do
 		self:Spawn(index, spawn)
 	end
 	task.spawn(function()

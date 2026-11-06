@@ -49,12 +49,12 @@ local function adorn(model, parent, name, size, offset, color, material, shape)
 	return item
 end
 
-local function buildBossModel(bossId, definition)
+local function buildBossModel(bossId, definition, arenaPosition)
 	local model = Instance.new("Model")
 	model.Name = bossId
 	model:SetAttribute("BossId", bossId)
 	model:SetAttribute("CombatTarget", true)
-	local origin = CFrame.new(definition.Arena + Vector3.new(0, 8, 0))
+	local origin = CFrame.new(arenaPosition + Vector3.new(0, 8, 0))
 	local root = createPart(model, "Root", Vector3.new(6, 13, 5), origin, definition.Palette.Primary, definition.Material)
 	root.Transparency = 1
 	local torso = adorn(model, root, "Torso", Vector3.new(9, 11, 5), CFrame.new(0, 2, 0), definition.Palette.Primary, definition.Material)
@@ -122,6 +122,13 @@ function BossService:GetServerTier()
 		end
 	end
 	return tier
+end
+
+function BossService:GetArenaPosition(definition)
+	if workspace:FindFirstChild("ImportedMapBase") and definition.ImportedArena then
+		return definition.ImportedArena
+	end
+	return definition.Arena
 end
 
 function BossService:SelectMutator()
@@ -479,7 +486,7 @@ function BossService:Spawn(bossId)
 	local mutator = self:SelectMutator()
 	local tier = self:GetServerTier()
 	local tierConfig = GameConfig.WorldTiers[tier]
-	local model, humanoid = buildBossModel(bossId, definition)
+	local model, humanoid = buildBossModel(bossId, definition, self:GetArenaPosition(definition))
 	local health = math.floor(definition.BaseHealth * tierConfig.Health * mutator.Health * (1 + math.max(0, #Players:GetPlayers() - 1) * 0.45))
 	humanoid.MaxHealth = health
 	humanoid.Health = health

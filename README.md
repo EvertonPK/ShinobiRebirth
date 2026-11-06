@@ -15,6 +15,8 @@ Projeto Roblox estruturado para desenvolvimento com Rojo. A versão nova preserv
 
 A Vila Shinobi funciona como hub e reúne residência central, academia, clínica, mercado, dojo, salão de clã e treino. Quatro regiões exploráveis saem dela: Fronteira das Cinzas com vulcão, Planalto da Tempestade com torre elétrica, Bosque Ancestral com santuário e Pântano do Vazio com ruínas. Cada região possui rota, inimigos, portal e arena de chefe.
 
+`SHINOBI_REBIRTH_MAPA_COMPLETO.rbxl` é a build para abrir diretamente no Roblox Studio. Ela preserva o mapa-base estático enviado pelo criador, define a casa japonesa como spawn e remove os scripts antigos do mapa antes de inserir os sistemas deste projeto.
+
 ## Estrutura
 
 - `src/ReplicatedStorage/ShinobiShared`: configurações e módulos compartilhados.
