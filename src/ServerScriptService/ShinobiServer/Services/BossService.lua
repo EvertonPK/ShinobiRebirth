@@ -127,6 +127,13 @@ function BossService:GetServerTier()
 end
 
 function BossService:GetArenaPosition(definition)
+	local integrated = workspace:FindFirstChild("ShinobiWorld")
+	local anchors = integrated and integrated:FindFirstChild("MapIntegration")
+	local bossSpawns = anchors and anchors:FindFirstChild("BossSpawns")
+	local marker = bossSpawns and bossSpawns:FindFirstChild(definition.Id or "")
+	if marker and marker:IsA("BasePart") then
+		return marker.Position
+	end
 	if workspace:FindFirstChild("ImportedMapBase") and definition.ImportedArena then
 		return definition.ImportedArena
 	end

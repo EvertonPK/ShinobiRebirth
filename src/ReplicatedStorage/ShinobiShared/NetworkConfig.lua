@@ -24,6 +24,7 @@ return table.freeze({
 		"AchievementUnlocked",
 		"LeaderboardRequest",
 		"LeaderboardState",
+		"WorldAction",
 	},
 	Functions = {
 		"GetInitialState",

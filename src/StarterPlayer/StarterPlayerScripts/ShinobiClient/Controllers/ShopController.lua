@@ -891,6 +891,15 @@ function ShopController:Start()
 			end
 		end)
 	end
+	local worldAction = self:Remote("WorldAction")
+	if worldAction then
+		worldAction.OnClientEvent:Connect(function(action, tab)
+			if action == "Shop" then
+				self.CurrentTab = tab or "Featured"
+				self:Open()
+			end
+		end)
+	end
 	for _, remoteName in { "LiveOpsState", "EventState", "DailyEventState" } do
 		local remote = self:Remote(remoteName)
 		if remote then

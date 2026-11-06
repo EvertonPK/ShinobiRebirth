@@ -524,6 +524,95 @@ function WorldService:BuildHolidayFestival(runtime)
 	workspace:SetAttribute("HolidayTheme", "Natal Shinobi")
 end
 
+local function landmark(instance)
+	if instance and instance:IsA("Model") then
+		local cframe, size = instance:GetBoundingBox()
+		return cframe, size
+	end
+	local basePart = instance and (instance:IsA("BasePart") and instance or instance:FindFirstChildWhichIsA("BasePart", true))
+	if basePart then
+		return basePart.CFrame, basePart.Size
+	end
+	return nil, nil
+end
+
+function WorldService:BuildMapIntegration(imported, runtime)
+	local integration = Instance.new("Folder")
+	integration.Name = "MapIntegration"
+	integration.Parent = runtime
+
+	local function find(name)
+		return imported:FindFirstChild(name, true)
+	end
+	local function anchor(name, target, offset)
+		local cframe, size = landmark(target)
+		if not cframe then return nil end
+		local point = part(integration, name, Vector3.new(2, 2, 2), cframe * CFrame.new(offset or Vector3.new(0, size.Y * 0.5 + 3, size.Z * 0.5 + 4)), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
+		point.Transparency = 1
+		point.CanCollide = false
+		point.CanTouch = false
+		return point
+	end
+	local function prompt(point, actionText, objectText, callback)
+		if not point then return end
+		local interaction = Instance.new("ProximityPrompt")
+		interaction.ActionText = actionText
+		interaction.ObjectText = objectText
+		interaction.HoldDuration = 0
+		interaction.MaxActivationDistance = 12
+		interaction.RequiresLineOfSight = false
+		interaction.Parent = point
+		interaction.Triggered:Connect(callback)
+	end
+	local commerce = find("VilaDoComercio") or find("CidadeComercio")
+	local shop = anchor("ShopEntrance", commerce)
+	prompt(shop, "Abrir loja", "Mercado Shinobi", function(player)
+		self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Featured")
+	end)
+	local quest = anchor("QuestEntrance", find("MestreDeMissoes"))
+	prompt(quest, "Ver objetivos", "Mestre de Missões", function(player)
+		local quests = self.Context.Services.QuestService
+		if quests then quests:EnsureDaily(player) end
+		self.Context.Remotes.WorldAction:FireClient(player, "Progression")
+	end)
+	local training = anchor("TrainingEntrance", find("TrainingZones"))
+	prompt(training, "Treinar", "Campo de Treino", function(player)
+		self.Context.Remotes.Notification:FireClient(player, { Kind = "Training", Text = "Acerte os bonecos e complete a missão Disciplina Shinobi para ganhar XP e Ryo." })
+	end)
+	local champion = anchor("ChampionHouse", find("Casa de Campeões"))
+	prompt(champion, "Ver coleção", "Casa de Campeões", function(player)
+		self.Context.Remotes.WorldAction:FireClient(player, "Shop", "Inventory")
+	end)
+
+	local bossSpawns = Instance.new("Folder")
+	bossSpawns.Name = "BossSpawns"
+	bossSpawns.Parent = integration
+	local arenaNames = { "Arena1_GolemDePedra", "Arena2_SerpenteSombria", "Arena3_EspiritoVazio", "BossArena" }
+	for index, bossId in BossConfig.Order do
+		local target = find(arenaNames[index]) or find("BossArena")
+		local cframe, size = landmark(target)
+		if cframe then
+			local spawn = part(bossSpawns, bossId, Vector3.new(2, 2, 2), cframe * CFrame.new(0, size.Y * 0.5 + 3, 0), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
+			spawn.Transparency, spawn.CanCollide, spawn.CanTouch = 1, false, false
+		end
+	end
+
+	local enemyZone = find("EnemySpawners")
+	local enemyCFrame, enemySize = landmark(enemyZone)
+	if enemyCFrame and enemySize then
+		local patrols = Instance.new("Folder")
+		patrols.Name = "EnemyPatrols"
+		patrols.Parent = integration
+		for index = 1, 12 do
+			local angle = index * math.pi * 2 / 12
+			local localOffset = Vector3.new(math.cos(angle) * math.max(8, enemySize.X * 0.32), enemySize.Y * 0.5 + 3, math.sin(angle) * math.max(8, enemySize.Z * 0.32))
+			local patrol = part(patrols, "Patrol" .. index, Vector3.new(2, 2, 2), enemyCFrame * CFrame.new(localOffset), Color3.new(1, 1, 1), Enum.Material.SmoothPlastic)
+			patrol.Transparency, patrol.CanCollide, patrol.CanTouch = 1, false, false
+		end
+	end
+	imported:SetAttribute("IntegratedWithMap", true)
+end
+
 function WorldService:BuildImportedRuntime(imported)
 	local existing = Workspace:FindFirstChild("ShinobiWorld")
 	if existing then
@@ -535,17 +624,7 @@ function WorldService:BuildImportedRuntime(imported)
 	runtime:SetAttribute("UsesImportedMap", true)
 	self.World = runtime
 
-	local training = Instance.new("Folder")
-	training.Name = "TrainingGround"
-	training.Parent = runtime
-	for index = 1, 6 do
-		local location = Vector3.new(250 + (index - 3) * 18, -1161, -1620)
-		local dummy = part(training, "TrainingDummy", Vector3.new(4, 10, 4), CFrame.new(location), Color3.fromRGB(112, 76, 51), Enum.Material.Wood)
-		dummy:SetAttribute("MaxHealth", 500)
-		dummy:SetAttribute("Health", 500)
-		dummy:SetAttribute("CombatTarget", true)
-	end
-	self:BuildHolidayFestival(runtime)
+	self:BuildMapIntegration(imported, runtime)
 
 	imported:SetAttribute("ShinobiMapReady", true)
 	self:BuildLighting()

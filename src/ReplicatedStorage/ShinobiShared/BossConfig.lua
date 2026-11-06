@@ -4,6 +4,7 @@ BossConfig.Order = { "EmberRonin", "StormOni", "VerdantSage", "VoidShogun" }
 
 BossConfig.Definitions = {
 	EmberRonin = {
+		Id = "EmberRonin",
 		DisplayName = "Ronin das Cinzas",
 		Subtitle = "A lâmina que nunca esfria",
 		BaseHealth = 8500,
@@ -21,6 +22,7 @@ BossConfig.Definitions = {
 		Drops = { "EmberCore", "RoninMask", "AshenKatanaSkin", "EmberEyes", "PhoenixMantle", "SolarFlareAura" },
 	},
 	StormOni = {
+		Id = "StormOni",
 		DisplayName = "Oni da Tempestade",
 		Subtitle = "O trovão ganhou um corpo",
 		BaseHealth = 12000,
@@ -38,6 +40,7 @@ BossConfig.Definitions = {
 		Drops = { "StormHorn", "OniArmorSkin", "RaijinAura", "TempestTwinBlade", "ThunderCrown", "CelestialStormEyes" },
 	},
 	VerdantSage = {
+		Id = "VerdantSage",
 		DisplayName = "Sábio Primordial",
 		Subtitle = "A floresta se lembra de tudo",
 		BaseHealth = 16000,
@@ -55,6 +58,7 @@ BossConfig.Definitions = {
 		Drops = { "SageSeed", "ForestCloakSkin", "VerdantEyes", "AncestorBarkArmor", "BlossomAura", "JadeSpear" },
 	},
 	VoidShogun = {
+		Id = "VoidShogun",
 		DisplayName = "Shogun do Vazio",
 		Subtitle = "O fim observa por trás da máscara",
 		BaseHealth = 24000,

@@ -38,6 +38,24 @@ local IMPORTED_MAP_SPAWNS = {
 	{ Id = "VoidWalker", Position = Vector3.new(1680, -1017, -3170) },
 }
 
+local function mapPatrolSpawns()
+	local world = workspace:FindFirstChild("ShinobiWorld")
+	local integration = world and world:FindFirstChild("MapIntegration")
+	local patrols = integration and integration:FindFirstChild("EnemyPatrols")
+	if not patrols then
+		return IMPORTED_MAP_SPAWNS
+	end
+	local ids = { "Rogue", "Rogue", "Rogue", "AshDisciple", "AshDisciple", "AshDisciple", "StormAcolyte", "StormAcolyte", "StormAcolyte", "VoidWalker", "VoidWalker", "VoidWalker" }
+	local result = {}
+	for index, id in ids do
+		local marker = patrols:FindFirstChild("Patrol" .. index)
+		if marker and marker:IsA("BasePart") then
+			table.insert(result, { Id = id, Position = marker.Position })
+		end
+	end
+	return #result > 0 and result or IMPORTED_MAP_SPAWNS
+end
+
 local function makePart(model, name, size, cframe, color, material, shape)
 	local object = Instance.new("Part")
 	object.Name = name
@@ -215,7 +233,7 @@ end
 
 function EnemyService:Start()
 	workspace:WaitForChild("ShinobiWorld")
-	local spawns = workspace:FindFirstChild("ImportedMapBase") and IMPORTED_MAP_SPAWNS or SPAWNS
+	local spawns = workspace:FindFirstChild("ImportedMapBase") and mapPatrolSpawns() or SPAWNS
 	for index, spawn in spawns do
 		self:Spawn(index, spawn)
 	end

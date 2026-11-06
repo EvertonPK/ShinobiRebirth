@@ -268,8 +268,8 @@ function HudController:Build()
 	self.ProgressClose = close
 	progressButton.Activated:Connect(function()
 		progressModal.Visible = not progressModal.Visible
-		if progressModal.Visible and self.Profile then
-			self:RenderProgression(self.Profile)
+		if progressModal.Visible then
+			self:RenderProgression(self.Profile or {})
 		end
 		if progressModal.Visible and UserInputService.GamepadEnabled then
 			GuiService.SelectedObject = close
@@ -326,6 +326,21 @@ function HudController:RenderProgression(profile)
 	end
 	local statPoints = math.max(0, math.floor(tonumber(profile.StatPoints) or 0))
 	local stats = type(profile.Stats) == "table" and profile.Stats or {}
+	local level = math.max(1, tonumber(profile.Level) or 1)
+	self:Section("OBJETIVO PRINCIPAL")
+	local objective
+	if level < 5 then
+		objective = "Treine no Campo de Treino e alcance o nível 5. Cada golpe também avança suas missões diárias."
+	elseif level < 15 then
+		objective = "Patrulhe a zona de inimigos, vença renegados e alcance o nível 15 para se preparar para os chefes."
+	elseif level < 30 then
+		objective = "Entre na primeira arena, derrote o Ronin das Cinzas e resgate as recompensas das missões."
+	elseif level < 60 then
+		objective = "Complete missões diárias, desbloqueie skins e enfrente o ciclo de chefes para fortalecer seu clã."
+	else
+		objective = "Domine os ciclos míticos, colete Essência e prepare-se para renascer no nível 100."
+	end
+	self:Row(objective)
 	self:Section("ATRIBUTOS  •  " .. statPoints .. " PONTOS DISPONÍVEIS")
 	for _, statName in { "Power", "Chakra", "Defense", "Speed" } do
 		self:Row(string.upper(statName) .. "  •  " .. tostring(stats[statName] or 0), "+1", function()
@@ -335,6 +350,9 @@ function HudController:RenderProgression(profile)
 	end
 	self:Section("MISSÕES DIÁRIAS")
 	local quests = type(profile.Quests) == "table" and profile.Quests.Daily or {}
+	if type(quests) ~= "table" or #quests == 0 then
+		self:Row("Carregando missões diárias. Se permanecer vazio, caminhe até o Mestre de Missões para atualizar seu registro.")
+	end
 	for index, quest in type(quests) == "table" and quests or {} do
 		local progress = math.max(0, tonumber(quest.Progress) or 0)
 		local goal = math.max(1, tonumber(quest.Goal) or 1)
@@ -364,7 +382,6 @@ function HudController:RenderProgression(profile)
 		self:Row("Derrote chefes para encontrar skins, auras e equipamentos raros.")
 	end
 	self:Section("REBIRTH")
-	local level = math.max(1, tonumber(profile.Level) or 1)
 	self:Row("Reinicia nível e atributos, preserva coleção e concede Essência permanente.", level >= 100 and "RENASCER" or "NÍVEL 100", function()
 		local remote = self:Remote("RebirthRequest")
 		if remote then remote:FireServer() end
@@ -518,6 +535,15 @@ function HudController:Start()
 	if notification then notification.OnClientEvent:Connect(function(payload) self:Notify(payload) end) end
 	local clanState = self:Remote("ClanState")
 	if clanState then clanState.OnClientEvent:Connect(function(state) self:UpdateClan(state) end) end
+	local worldAction = self:Remote("WorldAction")
+	if worldAction then
+		worldAction.OnClientEvent:Connect(function(action)
+			if action == "Progression" then
+				self.ProgressModal.Visible = true
+				self:RenderProgression(self.Profile or {})
+			end
+		end)
+	end
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if gameProcessed then
 			return
